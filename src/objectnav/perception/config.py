@@ -23,7 +23,7 @@ class YoloConfig:
     conf: float = field(default=0.45, metadata={"help": "Confidence threshold."})
     iou: float = field(default=0.35, metadata={"help": "IoU threshold for NMS."})
     imgsz: Tuple[int, int] = field(
-        default=(576, 1024),
+        default=(1080, 1920),
         metadata={"help": "Image (height, width) for inference."},
     )
     rect: bool = field(default=True, metadata={"help": "Enable rectangular inference."})
