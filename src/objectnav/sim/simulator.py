@@ -40,13 +40,17 @@ class SimulatorWrapper:
         sensors = {
             "color_sensor": {
                 "sensor_type": habitat_sim.SensorType.COLOR,
+                "sensor_model": sim_config.sensor_model,
                 "resolution": [sim_config.rgb_height, sim_config.rgb_width],
                 "position": [0.0, sim_config.sensor_height, 0.0],
+                "hfov_deg": sim_config.hfov_deg,
             },
             "depth_sensor": {
                 "sensor_type": habitat_sim.SensorType.DEPTH,
+                "sensor_model": sim_config.sensor_model,
                 "resolution": [sim_config.rgb_height, sim_config.rgb_width],
                 "position": [0.0, sim_config.sensor_height, 0.0],
+                "hfov_deg": sim_config.hfov_deg,
             },
         }
         sensor_specs = []
@@ -56,6 +60,8 @@ class SimulatorWrapper:
             spec.sensor_type = params["sensor_type"]
             spec.resolution = params["resolution"]
             spec.position = params["position"]
+            spec.hfov = params["hfov_deg"]
+            spec.SensorSubType = params["sensor_model"]
             sensor_specs.append(spec)
 
         agent_cfg = habitat_sim.agent.AgentConfiguration()
