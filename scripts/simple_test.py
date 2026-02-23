@@ -1,6 +1,9 @@
 import torch
 import random
+import hydra
 from pathlib import Path
+from omegaconf import DictConfig
+from hydra.utils import to_absolute_path
 from objectnav.constants import *
 from objectnav.sim.agent import init_agent
 from objectnav.sim.simulator import make_sim
@@ -14,22 +17,40 @@ from objectnav.perception.config import YoloConfig
 from objectnav.perception.pipeline import build_yolo_detector, run_yolo_detections
 
 
-def main():
-    # Pick a fixed seed (or read from CLI/env)
-    # seed = 1234 # deterministic seed for testing
-    seed = random.randint(0, 2**32 - 1) # random seed for non-deterministic runs
+@hydra.main(config_path="../configs", config_name="config", version_base=None)
+def main(cfg: DictConfig) -> None:
+
+    # Seed
+    seed = cfg.get("seed")
+    seed = random.randint(0, 2**32 - 1) if seed is None else int(seed)
+
+    output_dir = Path(to_absolute_path(cfg.paths.artifacts_dir)) / cfg.simple_test.outputs_subdir
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     # Load YOLO11x model
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    device = cfg.perception.device
+    if device == "auto":
+        device = "cuda:0" if torch.cuda.is_available() else "cpu"
     yolo_config = YoloConfig(
-        weights_path=Path("datasets/models/yolo11x.pt"),
+        weights_path=Path(to_absolute_path(cfg.perception.weights_path)),
         device=device,
-        use_softmax_patch=True
+        conf=float(cfg.perception.conf),
+        iou=float(cfg.perception.iou),
+        imgsz=tuple(cfg.perception.imgsz),
+        rect=bool(cfg.perception.rect),
+        half=bool(cfg.perception.half),
+        max_det=int(cfg.perception.max_det),
+        verbose=bool(cfg.perception.verbose),
+        use_softmax_patch=bool(cfg.perception.use_softmax_patch),
+        softmax_temperature=float(cfg.perception.softmax_temperature),
     )
     yolo_detector = build_yolo_detector(yolo_config)
 
     # Launch simulator
-    simulator = make_sim(scene_dataset_config=Path("datasets/ai2thor-hab/ai2thor-hab/ai2thor-hab.scene_dataset_config.json"), scene_id="FloorPlan2_physics")
+    simulator = make_sim(
+        scene_dataset_config=Path(to_absolute_path(cfg.sim.scene_dataset_config)),
+        scene_id=str(cfg.sim.scene_id),
+    )
         
     # Setting a seed for reproducibility    
     random.seed(seed) # This will make random sampling reproducible (eg. yaw degree)
@@ -61,12 +82,12 @@ def main():
         print("Action:", action)
         print("Collided:", collided)
         print("Agent_state: position", agent_state.position, "yaw", rotation_to_yaw(agent_state.rotation)) 
-        save_rgbd_observations(rgb, depth, save_path=f"outputs/observations_step_{i+1}.png")
+        save_rgbd_observations(rgb, depth, save_path=output_dir / f"observations_step_{i+1}.png")
         save_map_with_agent(
             grid_map,
             agent_state.position,
             agent_state.rotation,
-            save_path=f"outputs/grid_map_with_agent_step_{i+1}.png",
+            save_path=output_dir / f"grid_map_with_agent_step_{i+1}.png",
             sim=simulator.sim,
             title="Grid Map + Agent",
             agent_radius_px=20,
@@ -77,7 +98,7 @@ def main():
 
         save_yolo_detections_plot(
             yolo_result,
-            save_path=f"outputs/detections_step_{i+1}.png",
+            save_path=output_dir / f"detections_step_{i+1}.png",
             show_conf=True,
             show_labels=True,
             show_boxes=True,
@@ -100,7 +121,7 @@ def main():
     # Close simulator
     print("Closing simulator...")
     simulator.close()
-
+    
 
 if __name__ == "__main__":
     main()
