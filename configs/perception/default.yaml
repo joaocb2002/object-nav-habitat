@@ -7,7 +7,7 @@ device: auto
 # --- Inference parameters ---
 conf: 0.45
 iou: 0.35
-imgsz: [576, 1024]
+imgsz: [1080, 1920]
 rect: true
 half: false
 max_det: 30

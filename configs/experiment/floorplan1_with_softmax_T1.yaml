@@ -1,0 +1,10 @@
+# @package _global_
+# Experiment preset: FloorPlan1 + Softmax perception (T=1.0)
+name: floorplan1_with_softmax_T1
+seed: 1234
+
+defaults:
+  - /experiment: baseline
+  - /perception: softmax_T1
+  - _self_
+

@@ -3,7 +3,7 @@
 This project uses a Hydra-style configuration layout.
 
 - `config.yaml` is the root composition file (shared `paths` + `hydra.run.dir`).
-- `sim/`, `navmesh/`, `grid_map/` are config groups.
+- `sim/` and `perception/` are config groups for environment and model settings.
 - `experiment/` contains reproducible experiment presets (compositions).
 - `runs/` contains ad-hoc developer run presets (non-reproducible, local overrides).
 
@@ -15,3 +15,9 @@ Precedence (highest to lowest):
 1. CLI overrides
 2. YAML composition (`configs/*.yaml`)
 3. Code defaults (structured configs / dataclasses)
+
+Typical usage:
+- Reproducible run preset:
+  - `python <entrypoint>.py experiment=baseline`
+- Local debug override layered on top:
+  - `python <entrypoint>.py experiment=baseline +runs=debug`

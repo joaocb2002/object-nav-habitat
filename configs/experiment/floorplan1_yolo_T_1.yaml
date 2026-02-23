@@ -1,8 +1,0 @@
-# @package _global_
-name: floorplan1_highres_yolo_T_1
-seed: 1234
-
-defaults:
-  - /experiment: baseline
-  - /perception: softmax_T_1
-  - _self_

@@ -1,0 +1,3 @@
+# Softmax temperature override.
+# T=1.0 keeps the original logits scaling (no softening/sharpening).
+softmax_temperature: 1.0

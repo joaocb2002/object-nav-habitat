@@ -1,12 +1,10 @@
 # @package _global_
 # Experiment preset: baseline
-name: floorplan1_physics_baseline
+name: baseline_experiment
 seed: 1234
 
 # Selects variants from config groups.
 defaults:
   - /sim: floorplan1_physics
   - /perception: default
-  - /navmesh: default
-  - /grid_map: default
   - _self_

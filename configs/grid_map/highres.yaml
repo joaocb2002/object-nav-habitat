@@ -1,4 +1,0 @@
-# Higher resolution map (example variant)
-# Only override what differs from grid_map/default.yaml.
-
-map_resolution: 2048
