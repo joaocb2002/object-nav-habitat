@@ -17,11 +17,12 @@ class SimConfig:
     allow_sliding: bool = field(default=False, metadata={"help": "Allow sliding along obstacles when colliding."})
 
     # --- Sensor parameters ---
-    obs_scale: float = field(default=16/9, metadata={"help": "Aspect ratio for observations (width/height)."})
+    sensor_model: str = field(default="PINHOLE", metadata={"help": "Agent model type, e.g. 'pinhole' or 'fisheye'."})
     rgb_height: int = field(default=1080, metadata={"help": "Height of RGB sensor output. Standard is 1080p (HD)."})
     rgb_width: int = field(init=False, metadata={"help": "Width of RGB sensor output, computed from obs_scale."})
-    sensor_height: float = field(default=1.5, metadata={"help": "Sensor height from ground in meters."})
+    obs_scale: float = field(default=16/9, metadata={"help": "Aspect ratio for observations (width/height)."})
     hfov_deg: float = field(default=90.0, metadata={"help": "Horizontal field of view in degrees."})
+    sensor_height: float = field(default=1.5, metadata={"help": "Sensor height from ground in meters."})
 
     # --- Action space magnitudes ---
     forward_step: float = field(default=0.25, metadata={"help": "Forward step size in meters."})
