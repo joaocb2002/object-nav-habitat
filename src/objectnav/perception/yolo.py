@@ -50,23 +50,72 @@ class YOLODetector:
         return r0
     
     def _resolve_device(self) -> str:
-        # If user asked for CPU, respect it.
-        if self.config.device.startswith("cpu"):
+        """Resolve execution device from config with robust CUDA fallback behavior."""
+        requested = self.config.device.strip().lower()
+
+        # Auto-select best available backend.
+        if requested == "auto":
+            if not torch.cuda.is_available():
+                return "cpu"
+            for idx in range(torch.cuda.device_count()):
+                candidate = f"cuda:{idx}"
+                if self._is_cuda_device_usable(candidate):
+                    return candidate
+            warnings.warn("No usable CUDA device found; falling back to CPU for YOLO.")
             return "cpu"
+
+        # If user asked for CPU, respect it.
+        if requested.startswith("cpu"):
+            return "cpu"
+
+        # Normalize bare 'cuda' to index 0.
+        if requested == "cuda":
+            requested = "cuda:0"
 
         # If CUDA isn't available at all, fall back.
         if not torch.cuda.is_available():
             warnings.warn("CUDA not available; falling back to CPU for YOLO.")
             return "cpu"
 
-        # CUDA exists, but the installed torch build may not support this GPU arch.
-        # The most reliable check is to attempt a tiny CUDA op.
-        try:
-            _ = torch.zeros(1, device="cuda")
-            return self.config.device
-        except Exception as e:
-            warnings.warn(f"CUDA appears unusable with this PyTorch build; falling back to CPU. ({e})")
+        if requested.startswith("cuda:"):
+            try:
+                requested_index = int(requested.split(":", 1)[1])
+            except ValueError:
+                warnings.warn(f"Invalid CUDA device specifier '{self.config.device}'; falling back to CPU.")
+                return "cpu"
+
+            if requested_index < 0:
+                warnings.warn(f"Invalid CUDA device index '{requested_index}'; falling back to CPU.")
+                return "cpu"
+
+            if requested_index >= torch.cuda.device_count():
+                warnings.warn(
+                    "Requested CUDA device index is out of range "
+                    f"(requested={requested_index}, available={torch.cuda.device_count()}); "
+                    "falling back to CPU."
+                )
+                return "cpu"
+
+            if self._is_cuda_device_usable(requested):
+                return requested
+
+            warnings.warn(
+                f"Requested CUDA device '{requested}' is not usable with this PyTorch build; "
+                "falling back to CPU."
+            )
             return "cpu"
+
+        warnings.warn(f"Unknown device '{self.config.device}'; falling back to CPU.")
+        return "cpu"
+
+    @staticmethod
+    def _is_cuda_device_usable(device: str) -> bool:
+        """Return True if a lightweight tensor allocation succeeds on the CUDA device."""
+        try:
+            _ = torch.zeros(1, device=device)
+            return True
+        except Exception:
+            return False
 
     def parse_detections(self, results: "Results", image: np.ndarray) -> List[Detection]:
         """Parse a YOLO Results object into structured detections."""
