@@ -1,8 +1,7 @@
-import torch
 import random
 import hydra
 from pathlib import Path
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from hydra.utils import to_absolute_path
 from objectnav.constants import *
 from objectnav.sim.agent import init_agent
@@ -17,33 +16,22 @@ from objectnav.perception.config import YoloConfig
 from objectnav.perception.pipeline import build_yolo_detector, run_yolo_detections
 
 
-@hydra.main(config_path="../configs", config_name="config", version_base=None)
+@hydra.main(config_path="../configs", config_name="config", version_base="1.3")
 def main(cfg: DictConfig) -> None:
 
     # Seed
     seed = cfg.get("seed")
     seed = random.randint(0, 2**32 - 1) if seed is None else int(seed)
 
-    output_dir = Path(to_absolute_path(cfg.paths.artifacts_dir)) / cfg.simple_test.outputs_subdir
+    print("=== Effective config ===")
+    print(OmegaConf.to_yaml(cfg))
+
+    # To create artifacts, logs and checkpoints directories 
+    output_dir = Path(to_absolute_path(cfg.paths.artifacts_dir)) # Artifacts
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Load YOLO11x model
-    device = cfg.perception.device
-    if device == "auto":
-        device = "cuda:0" if torch.cuda.is_available() else "cpu"
-    yolo_config = YoloConfig(
-        weights_path=Path(to_absolute_path(cfg.perception.weights_path)),
-        device=device,
-        conf=float(cfg.perception.conf),
-        iou=float(cfg.perception.iou),
-        imgsz=tuple(cfg.perception.imgsz),
-        rect=bool(cfg.perception.rect),
-        half=bool(cfg.perception.half),
-        max_det=int(cfg.perception.max_det),
-        verbose=bool(cfg.perception.verbose),
-        use_softmax_patch=bool(cfg.perception.use_softmax_patch),
-        softmax_temperature=float(cfg.perception.softmax_temperature),
-    )
+    # Load YOLO11x model from composed Hydra config
+    yolo_config = YoloConfig.from_mapping(cfg.perception, resolve_path=to_absolute_path)
     yolo_detector = build_yolo_detector(yolo_config)
 
     # Launch simulator

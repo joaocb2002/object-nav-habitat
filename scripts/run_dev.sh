@@ -3,6 +3,8 @@ set -e # This makes the script exit immediately if any command exits with a non-
 
 IMAGE="ghcr.io/joaocb2002/object-nav-habitat/habitat-project:main"
 WORKDIR="/workspace"
+DATA_MOUNT_PATH="$WORKDIR/datasets"
+OUTPUT_MOUNT_PATH="$WORKDIR/outputs"
 
 # Set up data and output directories in the current working directory by default.
 DATA_DIR="${DATA_DIR:-$PWD/datasets}"
@@ -24,7 +26,9 @@ if [ $# -eq 0 ]; then
     -v /etc/passwd:/etc/passwd:ro \
     -v /etc/group:/etc/group:ro \
     -v "$(pwd)":"$WORKDIR" \
+    -v "$DATA_DIR":"$DATA_MOUNT_PATH":ro \
     -v "$DATA_DIR":/data:ro \
+    -v "$OUTPUT_DIR":"$OUTPUT_MOUNT_PATH" \
     -v "$OUTPUT_DIR":/outputs \
     -w "$WORKDIR" \
     $IMAGE \
@@ -41,7 +45,9 @@ else
     -v /etc/passwd:/etc/passwd:ro \
     -v /etc/group:/etc/group:ro \
     -v "$(pwd)":"$WORKDIR" \
+    -v "$DATA_DIR":"$DATA_MOUNT_PATH":ro \
     -v "$DATA_DIR":/data:ro \
+    -v "$OUTPUT_DIR":"$OUTPUT_MOUNT_PATH" \
     -v "$OUTPUT_DIR":/outputs \
     -w "$WORKDIR" \
     $IMAGE \

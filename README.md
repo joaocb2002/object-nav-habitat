@@ -33,15 +33,17 @@ The codebase is intentionally structured to separate **infrastructure** (Docker 
 ./scripts/run_dev.sh bash
 ```
 
-Inside the container, the repository is mounted at `/workspace`, datasets at `/data` (read-only), and outputs at `/outputs`.
+Inside the container, the repository is mounted at `/workspace`; datasets are available at `/workspace/datasets` (also `/data`, read-only), and outputs at `/workspace/outputs` (also `/outputs`).
 
 ---
 
 ## Data and outputs
 
 - Datasets are **not** bundled in the images.
-- By default, datasets are read from `${DATA_DIR:-$PWD/datasets}` on the host and mounted into the container.
-- Outputs are written to `${OUTPUT_DIR:-$PWD/outputs}` on the host (mounted to `/outputs`).
+- Code and configs use repository-relative paths (for example `datasets/...`, `outputs/...`).
+- By default, `${DATA_DIR:-$PWD/datasets}` on the host is mounted to `/workspace/datasets` (and also `/data` for compatibility).
+- By default, `${OUTPUT_DIR:-$PWD/outputs}` on the host is mounted to `/workspace/outputs` (and also `/outputs` for compatibility).
+- This means `DATA_DIR` and `OUTPUT_DIR` choose the **host source directories** for bind mounts; they do not change path strings inside configs.
 
 To override dataset/output locations:
 

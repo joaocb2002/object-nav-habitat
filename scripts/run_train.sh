@@ -3,6 +3,8 @@ set -e
 
 IMAGE="ghcr.io/joaocb2002/object-nav-habitat/habitat-project:main"
 WORKDIR="/workspace"
+DATA_MOUNT_PATH="$WORKDIR/datasets"
+OUTPUT_MOUNT_PATH="$WORKDIR/outputs"
 
 # Set up data and output directories in the current working directory by default.
 DATA_DIR="${DATA_DIR:-$PWD/datasets}"
@@ -28,7 +30,9 @@ docker run --rm \
   -v /etc/passwd:/etc/passwd:ro \
   -v /etc/group:/etc/group:ro \
   -v "$(pwd)":$WORKDIR \
+  -v "$DATA_DIR":"$DATA_MOUNT_PATH":ro \
   -v "$DATA_DIR":/data:ro \
+  -v "$OUTPUT_DIR":"$OUTPUT_MOUNT_PATH" \
   -v "$OUTPUT_DIR":/outputs \
   -w $WORKDIR \
   $IMAGE \
