@@ -16,5 +16,5 @@ def save_yolo_detections_plot(
         labels=show_labels,
         boxes=show_boxes,
         save=True,
-        filename=save_path,
+        filename=str(save_path),
     )
