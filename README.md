@@ -173,5 +173,5 @@ habitat-viewer --dataset /path/to/<scene_dataset_config>.json <scene_name>
 ## 9) Additional docs
 
 - `configs/README.md` for config composition conventions
-- `HELP.md` for maintainer workflows (locks, rebuild, publish)
+- `docs/HELP.md` for maintainer workflows (locks, rebuild, publish)
 
