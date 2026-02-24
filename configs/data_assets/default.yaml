@@ -1,0 +1,4 @@
+# Versioned reproducibility data assets
+camera_intrinsics_path: datasets/data_assets/objectnav/v1/camera_intrinsics.json
+indoor_classes_path: datasets/data_assets/objectnav/v1/indoor_classes.json
+object_class_bins_path: datasets/data_assets/objectnav/v1/object_class_bins.json
