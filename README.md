@@ -74,6 +74,10 @@ Canonical assets are stored at:
 
 Hydra config group: `data_assets` (default: `data_assets=default`).
 
+Note: this repository keeps `data_assets` composition at the experiment level.
+The root config composes `experiment`, and presets such as `experiment=baseline`
+inject `/data_assets: default`.
+
 ### 3.3 Regenerating / normalizing data-assets
 
 ```bash
@@ -100,10 +104,22 @@ Smoke test:
 ./scripts/run_dev.sh python <script>.py
 ```
 
+Optional faster loop (skip editable reinstall on each invocation):
+
+```bash
+SKIP_EDITABLE_INSTALL=1 ./scripts/run_dev.sh python <script>.py
+```
+
 ### 4.2 Long / non-interactive runs
 
 ```bash
 ./scripts/run_train.sh python <script>.py
+```
+
+Optional faster loop:
+
+```bash
+SKIP_EDITABLE_INSTALL=1 ./scripts/run_train.sh python <script>.py
 ```
 
 ---
