@@ -1,119 +1,161 @@
 # ObjectNav-Habitat 🧭
 
-This repository is a **reproducible research stack** for running *Habitat-Sim / Habitat-Lab* experiments with a focus on the **ObjectNav** task. The long-term research direction is to combine:
+Reproducible research stack for Habitat-Sim / Habitat-Lab experiments focused on ObjectNav.
 
-- **Deep reinforcement learning** for control and policy learning
-- **Probabilistic / Bayesian inference** for state estimation and decision-making under uncertainty
+Research direction:
+- Deep reinforcement learning for control/policy learning
+- Probabilistic / Bayesian inference for uncertainty-aware decision making
 
-The codebase is intentionally structured to separate **infrastructure** (Docker images, scripts, dependency pinning) from **research logic** (agents, belief updates, perception, evaluation).
-
-> Status: early-stage and evolving. Expect breaking changes while APIs and experiment protocols stabilize. 🚧
+> Status: early-stage and evolving 🚧
 
 ---
 
-## Quickstart (Docker, recommended)
+## 1) What this repository provides
 
-### Host prerequisites
+1. Docker-first, reproducible runtime setup
+2. Hydra-based experiment/config composition
+3. Research modules under `src/objectnav/` (belief, sim, perception, utilities)
+4. Versioned lightweight data assets for reproducibility
+
+---
+
+## 2) Quickstart ⚡
+
+### 2.1 Host prerequisites
 
 - Linux (Ubuntu 22.04 recommended)
 - NVIDIA GPU + recent driver
 - Docker Engine
-- NVIDIA Container Toolkit (required for GPU access)
+- NVIDIA Container Toolkit
 
-### Sanity check
+### 2.2 Bootstrap and sanity check
 
 ```bash
 ./scripts/bootstrap.sh
 ./scripts/run_dev.sh python scripts/sanity_check.py
 ```
 
-### Interactive development
+### 2.3 Open an interactive dev shell
 
 ```bash
 ./scripts/run_dev.sh bash
 ```
 
-Inside the container, the repository is mounted at `/workspace`; datasets are available at `/workspace/datasets` (also `/data`, read-only), and outputs at `/workspace/outputs` (also `/outputs`).
+Container mount layout:
+- Repo: `/workspace`
+- Datasets: `/workspace/datasets` (also `/data`, read-only compatibility)
+- Outputs: `/workspace/outputs` (also `/outputs` compatibility)
 
 ---
 
-## Data and outputs
+## 3) Data and reproducibility 📦
 
-- Datasets are **not** bundled in the images.
-- Code and configs use repository-relative paths (for example `datasets/...`, `outputs/...`).
-- By default, `${DATA_DIR:-$PWD/datasets}` on the host is mounted to `/workspace/datasets` (and also `/data` for compatibility).
-- By default, `${OUTPUT_DIR:-$PWD/outputs}` on the host is mounted to `/workspace/outputs` (and also `/outputs` for compatibility).
-- This means `DATA_DIR` and `OUTPUT_DIR` choose the **host source directories** for bind mounts; they do not change path strings inside configs.
+### 3.1 Runtime path behavior
 
-To override dataset/output locations:
+1. Datasets are not bundled in Docker images.
+2. Configs/scripts use repository-relative paths (for example `datasets/...`, `outputs/...`).
+3. `${DATA_DIR:-$PWD/datasets}` selects host dataset bind source.
+4. `${OUTPUT_DIR:-$PWD/outputs}` selects host output bind source.
+
+Override mounts (host-side):
 
 ```bash
 export DATA_DIR=/path/to/datasets
 export OUTPUT_DIR=/path/to/outputs
 ```
 
+### 3.2 Versioned data-assets (tracked in git)
+
+Canonical assets are stored at:
+
+- `datasets/data_assets/objectnav/v1/camera_intrinsics.json`
+- `datasets/data_assets/objectnav/v1/indoor_classes.json`
+- `datasets/data_assets/objectnav/v1/object_class_bins.json`
+
+Hydra config group: `data_assets` (default: `data_assets=default`).
+
+### 3.3 Regenerating / normalizing data-assets
+
+```bash
+python scripts/data_assets/normalize_data_assets.py \
+  --camera-intrinsics <path/to/camera-intrinsics.json> \
+  --indoor-classes <path/to/indoor-objects.json> \
+  --object-bins <path/to/object-classes-bins.json> \
+  --out-dir datasets/data_assets/objectnav/v1
+```
+
+Smoke test:
+
+```bash
+./scripts/run_dev.sh python scripts/tests/test_data_assets_loader.py
+```
+
 ---
 
-## Repository layout
+## 4) Running workflows 🧪
 
+### 4.1 Iterative development runs
+
+```bash
+./scripts/run_dev.sh python <script>.py
 ```
+
+### 4.2 Long / non-interactive runs
+
+```bash
+./scripts/run_train.sh python <script>.py
+```
+
+---
+
+## 5) Repository layout
+
+```text
 .
-├── configs/                 # Experiment configuration files
+├── configs/                 # Hydra composition (experiments, sim, perception, data_assets)
 ├── docker/                  # Reproducible images (base + project)
-├── scripts/                 # Container entrypoints and helpers
-├── src/objectnav/           # Research code (agents, belief, perception, sim utils)
-├── datasets/                # (Optional) local datasets (not versioned in practice)
-└── outputs/                 # Run artifacts (not versioned)
+├── scripts/                 # Entrypoints and helper scripts
+│   ├── data_assets/         # Data-asset normalization/regeneration scripts
+│   └── tests/               # Lightweight test scripts
+├── src/objectnav/           # Core research code
+├── datasets/                # Local datasets + tracked lightweight data-assets
+└── outputs/                 # Run artifacts (ignored)
 ```
 
 ---
 
-## Running experiments
+## 6) Docker images (GHCR)
 
-This repo is evolving towards configuration-driven experiments under `configs/` and research modules under `src/objectnav/`.
-
-- Use `./scripts/run_dev.sh python <script>.py` for iterative runs.
-- Use `./scripts/run_train.sh python <script>.py` for non-interactive, long runs.
-
-If you are adding new research components, prefer placing them under `src/objectnav/` and keeping them composable and seedable.
-
----
-
-## Docker images (GHCR)
-
-Prebuilt images are published to GitHub Container Registry:
-
+Published images:
 - `ghcr.io/joaocb2002/object-nav-habitat/habitat-base`
 - `ghcr.io/joaocb2002/object-nav-habitat/habitat-project`
 
 Tags:
-
-- `:main` — latest build from the main branch
-- `:sha-<commit>` — immutable builds for exact reproducibility
-
----
-
-## Troubleshooting
-
-- GPU not visible in container: verify NVIDIA Container Toolkit installation.
-- `import habitat_sim` fails: check driver compatibility and base image.
-- Unexpected behavior after dependency changes: pull the latest image, or rebuild locally.
+- `:main` → latest main branch build
+- `:sha-<commit>` → immutable reproducible build
 
 ---
 
-## Viewer utility
-
-To inspect a digital scene visually (inside a Habitat environment):
+## 7) Viewer utility 👀
 
 ```bash
 habitat-viewer --dataset /path/to/<scene_dataset_config>.json <scene_name>
-# Example (from repo root):
+# Example:
 # habitat-viewer --dataset datasets/ai2thor-hab/ai2thor-hab/ai2thor-hab.scene_dataset_config.json FloorPlan1_physics
 ```
 
 ---
 
-## Maintainer notes
+## 8) Troubleshooting
 
-Notes on updating dependency lockfiles, rebuilding/publishing images, and other repo maintenance live in `HELP.md`.
+1. GPU not visible in container → check NVIDIA Container Toolkit.
+2. `import habitat_sim` fails → verify driver/image compatibility.
+3. Dependency drift issues → pull latest image or rebuild.
+
+---
+
+## 9) Additional docs
+
+- `configs/README.md` for config composition conventions
+- `HELP.md` for maintainer workflows (locks, rebuild, publish)
 
