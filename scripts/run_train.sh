@@ -10,6 +10,15 @@ OUTPUT_MOUNT_PATH="$WORKDIR/outputs"
 DATA_DIR="${DATA_DIR:-$PWD/datasets}"
 OUTPUT_DIR="${OUTPUT_DIR:-$PWD/outputs}"
 
+# Optional speed-up for iterative development.
+# Default keeps reproducibility behavior (editable install on each run).
+# Set SKIP_EDITABLE_INSTALL=1 to skip `pip install -e .`.
+if [ "${SKIP_EDITABLE_INSTALL:-0}" = "1" ]; then
+  ENTRY_CMD='exec "$@"'
+else
+  ENTRY_CMD='pip install --user -e . && exec "$@"'
+fi
+
 # Create data and output directories if they don't exist. If they already exist, do nothing.
 mkdir -p "$DATA_DIR"
 mkdir -p "$OUTPUT_DIR"
@@ -36,7 +45,7 @@ docker run --rm \
   -v "$OUTPUT_DIR":/outputs \
   -w $WORKDIR \
   $IMAGE \
-  bash -lc "pip install --user -e . && exec \"\$@\"" -- "$@"
+  bash -lc "$ENTRY_CMD" -- "$@"
 
 # Differences from run_dev.sh:
     # Uses --ipc=host for shared memory

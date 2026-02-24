@@ -10,6 +10,17 @@ OUTPUT_MOUNT_PATH="$WORKDIR/outputs"
 DATA_DIR="${DATA_DIR:-$PWD/datasets}"
 OUTPUT_DIR="${OUTPUT_DIR:-$PWD/outputs}"
 
+# Optional speed-up for iterative development.
+# Default keeps reproducibility behavior (editable install on each run).
+# Set SKIP_EDITABLE_INSTALL=1 to skip `pip install -e .`.
+if [ "${SKIP_EDITABLE_INSTALL:-0}" = "1" ]; then
+  SHELL_CMD='exec bash'
+  ENTRY_CMD='exec "$@"'
+else
+  SHELL_CMD='pip install --user -e . && exec bash'
+  ENTRY_CMD='pip install --user -e . && exec "$@"'
+fi
+
 # Create data and output directories if they don't exist. If they already exist, do nothing.
 mkdir -p "$OUTPUT_DIR"
 mkdir -p "$DATA_DIR"
@@ -32,7 +43,7 @@ if [ $# -eq 0 ]; then
     -v "$OUTPUT_DIR":/outputs \
     -w "$WORKDIR" \
     $IMAGE \
-    bash -lc "pip install --user -e . && exec bash"
+    bash -lc "$SHELL_CMD"
 else
   # Run the provided command after installing the package.
   docker run --rm -it \
@@ -51,7 +62,7 @@ else
     -v "$OUTPUT_DIR":/outputs \
     -w "$WORKDIR" \
     $IMAGE \
-    bash -lc "pip install --user -e . && exec \"\$@\"" -- "$@"
+    bash -lc "$ENTRY_CMD" -- "$@"
 fi
 
 # Note: The use of 'bash -lc' ensures that the user's shell environment is loaded, allowing access to user-installed packages.
