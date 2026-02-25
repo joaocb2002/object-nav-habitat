@@ -1,8 +1,8 @@
 import random
 import hydra
 from pathlib import Path
-from omegaconf import DictConfig, OmegaConf
 from hydra.utils import to_absolute_path
+from omegaconf import DictConfig, OmegaConf
 from objectnav.sim.agent import init_agent
 from objectnav.sim.simulator import make_sim
 from objectnav.sim.navmesh import compute_navmesh
