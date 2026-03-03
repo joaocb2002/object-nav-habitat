@@ -18,11 +18,11 @@ class SimConfig:
 
     # --- Sensor parameters ---
     sensor_model: str = field(default="PINHOLE", metadata={"help": "Agent model type, e.g. 'pinhole' or 'fisheye'."})
-    rgb_height: int = field(default=1080, metadata={"help": "Height of RGB sensor output. Standard is 1080p (HD)."})
+    rgb_height: int = field(default=480, metadata={"help": "Height of RGB sensor output. Standard is 1080p (HD)."})
     rgb_width: int = field(init=False, metadata={"help": "Width of RGB sensor output, computed from obs_scale."})
-    obs_scale: float = field(default=16/9, metadata={"help": "Aspect ratio for observations (width/height)."})
-    hfov_deg: float = field(default=90.0, metadata={"help": "Horizontal field of view in degrees."})
-    sensor_height: float = field(default=1.5, metadata={"help": "Sensor height from ground in meters."})
+    obs_scale: float = field(default=4/3, metadata={"help": "Aspect ratio for observations (width/height)."})
+    hfov_deg: float = field(default=79.0, metadata={"help": "Horizontal field of view in degrees."})
+    sensor_height: float = field(default=0.88, metadata={"help": "Sensor height from ground in meters."})
 
     # --- Action space magnitudes ---
     forward_step: float = field(default=0.25, metadata={"help": "Forward step size in meters."})
@@ -49,8 +49,8 @@ class NavmeshConfig:
     filter_walkable_low_height_spans: bool = field(default=True, metadata={"help": "Filter walkable low height spans during navmesh generation."})
    
     # --- Agent geometry ---
-    agent_height: float = field(default=1.5, metadata={"help": "Height of the agent in meters."})
-    agent_radius: float = field(default=0.20, metadata={"help": "Radius of the agent in meters."})
+    agent_height: float = field(default=0.88, metadata={"help": "Height of the agent in meters."})
+    agent_radius: float = field(default=0.18, metadata={"help": "Radius of the agent in meters."})
     agent_max_climb: float = field(default=0.2, metadata={"help": "Maximum climbable height in meters."})
     agent_max_slope: float = field(default=45.0, metadata={"help": "Maximum navigable slope in degrees."})
 
