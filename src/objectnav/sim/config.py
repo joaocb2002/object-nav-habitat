@@ -11,7 +11,6 @@ class SimConfig:
     """
 
     # --- Simulation parameters ---
-    scene_dataset_config: Optional[Path] = field(default=None, metadata={"help": "Path to scene dataset config file."})
     scene_id: Optional[str] = field(default=None, metadata={"help": "Scene ID to load."})
     enable_physics: bool = field(default=True, metadata={"help": "Enable physics simulation."})
     allow_sliding: bool = field(default=False, metadata={"help": "Allow sliding along obstacles when colliding."})

@@ -27,11 +27,8 @@ class SimulatorWrapper:
         # Simulator configuration
         sim_cfg = habitat_sim.SimulatorConfiguration()
         sim_cfg.gpu_device_id = 0
-        if not sim_config.scene_dataset_config:
-            raise ValueError("sim_config.scene_dataset_config must be provided.")
         if not sim_config.scene_id:
             raise ValueError("sim_config.scene_id must be provided.")
-        sim_cfg.scene_dataset_config_file = str(sim_config.scene_dataset_config)
         sim_cfg.scene_id = sim_config.scene_id
         sim_cfg.enable_physics = sim_config.enable_physics
         sim_cfg.allow_sliding = sim_config.allow_sliding
@@ -74,21 +71,17 @@ class SimulatorWrapper:
 
         return habitat_sim.Configuration(sim_cfg, [agent_cfg])
 
-def make_sim(scene_dataset_config: Path, scene_id: str) -> SimulatorWrapper:
+def make_sim(scene_id: str) -> SimulatorWrapper:
     """
     Create a Simulator instance using SimConfig, overriding dataset and scene.
     Raises:
         TypeError: if argument types are incorrect.
         ValueError: if arguments are missing.
     """
-    if scene_dataset_config is None:
-        raise ValueError("scene_dataset_config must be provided (got None).")
-    if not isinstance(scene_dataset_config, Path):
-        raise TypeError(f"scene_dataset_config must be a pathlib.Path, got {type(scene_dataset_config).__name__}.")
     if scene_id is None:
         raise ValueError("scene_id must be provided (got None).")
     if not isinstance(scene_id, str):
         raise TypeError(f"scene_id must be a str, got {type(scene_id).__name__}.")
 
-    sim_config = SimConfig(scene_dataset_config=scene_dataset_config, scene_id=scene_id)
+    sim_config = SimConfig(scene_id=scene_id)
     return SimulatorWrapper(sim_config)
