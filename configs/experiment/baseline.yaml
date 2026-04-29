@@ -6,6 +6,6 @@ seed: 1234
 # Selects variants from config groups.
 defaults:
   - /data_assets: default
-  - /sim: floorplan1_physics
+  - /scene: 00000-kfPV7w3FaU5
   - /perception: default
   - _self_

@@ -4,7 +4,7 @@ This project uses a Hydra-style configuration layout.
 
 - `config.yaml` is the root composition file (shared `paths` + `hydra.run.dir`).
 - `config.yaml` intentionally composes `experiment` only; it does **not** directly select `data_assets`.
-- `sim/` and `perception/` are config groups for environment and model settings.
+- `scene/` and `perception/` are config groups for environment and model settings.
 - `data_assets/` selects versioned, reproducibility-critical data files (camera intrinsics, class ids, bins).
 - `experiment/` contains reproducible experiment presets (compositions).
 - `runs/` contains ad-hoc developer run presets (non-reproducible, local overrides).
