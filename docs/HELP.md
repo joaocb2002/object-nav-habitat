@@ -103,7 +103,7 @@ To keep the repo clear for future developers, treat configs by intent:
 - CLI overrides
 - `configs/experiment/`
 - `configs/perception/`
-- `configs/sim/` (scene selection per experiment)
+- `configs/scene/` (scene selection per experiment)
 - `configs/runs/` (local dev overrides)
 
 ### 4.2 Authoritative defaults / invariants (change carefully)
