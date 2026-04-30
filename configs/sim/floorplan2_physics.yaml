@@ -1,3 +1,0 @@
-# Scene: AI2-THOR FloorPlan2
-scene_dataset_config: datasets/ai2thor-hab/ai2thor-hab/ai2thor-hab.scene_dataset_config.json
-scene_id: FloorPlan2_physics
