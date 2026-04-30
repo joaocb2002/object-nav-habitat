@@ -1,7 +1,7 @@
 # Defaults for objectnav.perception.YoloConfig
 
 # --- Model parameters ---
-weights_path: datasets/models/yolo11x.pt
+weights_path: datasets/perception_models/yolo11x.pt
 device: auto
 
 # --- Inference parameters ---
