@@ -67,7 +67,7 @@ def init_agent(
         position_arr = np.asarray(
             sim.pathfinder.get_random_navigable_point(
                 max_tries=100,
-                island_index=largest_island_index,
+                #island_index=largest_island_index,
             ),
             dtype=np.float32,
         )
@@ -80,12 +80,12 @@ def init_agent(
     if not sim.pathfinder.is_navigable(position_arr):
         raise ValueError(f"position {position_arr.tolist()} is not navigable")
 
-    position_island_index = int(sim.pathfinder.get_island(position_arr))
-    if position_island_index != largest_island_index:
-        raise ValueError(
-            "position is on a different navmesh island than the largest non-outdoor island "
-            f"(position island={position_island_index}, expected={largest_island_index})"
-        )
+    # position_island_index = int(sim.pathfinder.get_island(position_arr))
+    # if position_island_index != largest_island_index:
+    #     raise ValueError(
+    #         "position is on a different navmesh island than the largest non-outdoor island "
+    #         f"(position island={position_island_index}, expected={largest_island_index})"
+    #     )
 
     if orientation is None:
         # Uniform in [-180, 180) without ever returning 180.
