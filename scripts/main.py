@@ -44,7 +44,8 @@ def main(cfg: DictConfig) -> None:
     simulator.sim.pathfinder.seed(seed)
 
     # Get navigation mesh
-    if not compute_navmesh(simulator.sim): raise RuntimeError("Failed to compute navigation mesh.")
+    if not simulator.sim.pathfinder.is_loaded and not compute_navmesh(simulator.sim):
+        raise RuntimeError("Failed to compute navigation mesh.")
     grid_map = build_grid_map_from_navmesh(simulator.sim)
 
     # Initialize the (only) agent: configuration was made in simulator creation
