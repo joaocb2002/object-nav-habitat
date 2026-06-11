@@ -67,6 +67,16 @@
     print("Resetting simulator...")
     simulator.reset() 
 
+    print("=== Effective config ===")
+    print(OmegaConf.to_yaml(cfg))
+
+    print(
+        "Loaded data assets:",
+        f"{len(data_assets.indoor_classes)} classes,",
+        f"{len(data_assets.object_class_bins)} bin tables,",
+        f"resolution={data_assets.camera_intrinsics.width}x{data_assets.camera_intrinsics.height}",
+    )
+
 
     CLAUDE.MD 
 
